@@ -1,0 +1,21 @@
+<html>
+<head>
+<style type='text/css'>
+body {
+	font-family: 'Helvetica';
+}
+</style>
+<script src='/js/guid.js'></script>
+<script type="text/javascript">
+    init = function()
+    {
+        new_game_link.href = new_game_link.href.replace('unknown', guid());
+    }
+</script>
+</head>
+<body onload="init()">
+	<p>Module: {{ current_module_name }}</p>
+	<p>Instance: {{ current_instance_id }}</p>
+    <a id='new_game_link' href='/unknown/game/new'>Start new game</a>
+</body>
+</html>

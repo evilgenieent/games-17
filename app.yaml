@@ -1,0 +1,17 @@
+application: games1001
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: false
+
+libraries:
+- name: webapp2
+  version: latest
+  
+handlers:
+- url: /js
+  static_dir: js 
+
+- url: /.*
+  script: main.app
+  

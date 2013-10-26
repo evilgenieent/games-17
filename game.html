@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>Game</title>
+<script src='/_ah/channel/jsapi'></script>
+<script src="/js/comms.js"></script>
+<script src="/js/cards.js"></script>
+<script type="text/javascript">
+    var state = {
+        game_id: '{{ game_id }}',
+        game_link: '{{ game_link }}',
+        me: '{{ me }}'
+    };
+      
+	initialize = function() {
+		openChannel({{ token }});
+	}      
+	
+	setTimeout(initialize, 100);
+</script>
+</head>
+<body onload="draw();">
+	<div style="display: none;">
+		<img id="cards" src="/images/cards/ornamental_36_180dpi.png" />
+		<img id="decks" src="/images/cards/decks.png" />
+	</div>
+	<canvas id="canvas" width="800" height="480"></canvas>
+</body>
+</html>
