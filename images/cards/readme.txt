@@ -1,0 +1,1 @@
+These images are created from the works published at openclipart.org
