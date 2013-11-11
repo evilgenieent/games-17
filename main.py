@@ -28,7 +28,7 @@ class GameModel(ndb.Model):
     """All the data we store for a game"""
     date = ndb.DateTimeProperty(auto_now_add=True)
     
-class Game:
+class Game(object):
     @classmethod
     def get_game_url(cls, user_id, game_id):
         return '/' + str(user_id) + '/game/' + str(game_id)

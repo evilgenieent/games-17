@@ -1,9 +1,38 @@
+var cardSuits = ['s','c','d','h'];
+var cardFaces = ['2','3','4','5','6','7','8','9','10','j','q','k','a'];
+
+function getCardRect(cardsMap, totalCount, card)
+{
+	/*TODO: move totalCount to Image property*/
+	var suiteIndex = 3; // row in the card map
+	if (card[0] === 'd') suiteIndex = 2;
+	if (card[0] === 'c') suiteIndex = 1;
+	if (card[0] === 's') suiteIndex = 0;
+	
+	var rowLength = totalCount / 4;
+    var startIndex = cardFaces.length - rowLength;
+
+    var cardWidth = Math.floor(cardsMap.width / rowLength);
+    var cardHeight = Math.floor(cardsMap.height / 4);
+    
+    var cardY = suiteIndex + cardHeight;
+    var cardX = 0;
+    for ( var c = 0; c < rowLength; c++) {
+    	if (cardFaces[startIndex + c] === card.substring(1))
+		{
+    		cardX = c * cardWidth;
+    		break;
+		}
+    }
+    
+    return { x:cardX, y:cardY, width:cardWidth, height:cardHeight };
+}
 
 function draw() {
     var canvas = document.getElementById('canvas');
     var ctx = canvas.getContext('2d');
 
-    ctx.fillStyle = "rgb(0,200,200)";
+    ctx.fillStyle = 'rgb(0,200,200)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     var cards = document.getElementById('cards');
@@ -31,14 +60,10 @@ function draw() {
         x = x + cardW / cardShift;
         ctx.drawImage(packs, r * cardWidth, 0, cardWidth, cardHeight, x, y, cardW, cardH);
     }
-
 }
 
 function shuffle()
 {
-    var suits = ["s","c","d","h"];
-    var faces = ["6","7","8","9","10","j","q","k","a"];
-   
+  
     var deck = [];
-    for (var)
 }

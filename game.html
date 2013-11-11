@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8" />
+<meta charset='UTF-8' />
 <title>Game</title>
 <script src='/_ah/channel/jsapi'></script>
-<script src="/js/comms.js"></script>
-<script src="/js/cards.js"></script>
-<script type="text/javascript">
+<script src='/js/comms.js'></script>
+<script src='/js/cards.js'></script>
+<script src='/js/kinetic-v4.7.2.js'></script>
+<script defer="defer" type='text/javascript'>
     var state = {
         game_id: '{{ game_id }}',
         game_link: '{{ game_link }}',
@@ -14,17 +15,43 @@
     };
       
 	initialize = function() {
-		openChannel({{ token }});
+		openChannel('{{ token }}');
 	}      
 	
-	setTimeout(initialize, 100);
+	/*setTimeout(initialize, 100);*/
 </script>
 </head>
-<body onload="draw();">
-	<div style="display: none;">
-		<img id="cards" src="/images/cards/ornamental_36_180dpi.png" />
-		<img id="decks" src="/images/cards/decks.png" />
+<body onload='draw();'>
+	<div style='display: none;'>
+		<img id='cards' src='/images/cards/ornamental_36_180dpi.png' onload='drawCards();'/>
+		<img id='decks' src='/images/cards/decks.png' />
 	</div>
-	<canvas id="canvas" width="800" height="480"></canvas>
+	<canvas id='canvas' width='800' height='480'></canvas>
+	<div id='kntc'></div>
+	<script defer="defer" type='text/javascript'>
+	    var stage = new Kinetic.Stage({
+	        width: 800,
+	        height: 300,
+	        container: 'kntc'
+	        });
+	        
+        var layer = new Kinetic.Layer();
+        
+        var imageObj = document.getElementById('cards');
+
+        var cardRect = getCardRect(imageObj, 36, 's6');
+
+        var image = new Kinetic.Image({
+            x: 200,
+            y: 0,
+            height: cardRect.height/3,
+            width: cardRect.width/3,
+            image: imageObj,
+            crop: cardRect
+        });
+        
+        layer.add(image);
+        stage.add(layer);
+    </script>
 </body>
 </html>
