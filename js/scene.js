@@ -3,10 +3,19 @@
 function drawScene(containerId, cardsId, decksId) {
     var stage = new Kinetic.Stage({
         width: 800,
-        height: 300,
+        height: 480,
         container: containerId
         });
-        
+    
+    var bg = new Kinetic.Layer();
+    var bgFill = new Kinetic.Rect({
+        height: stage.getHeight(),
+        width: stage.getWidth(),
+        fill: 'rgb(0,200,200)'
+        });
+    bg.add(bgFill);
+    stage.add(bg);
+    
     var layer = new Kinetic.Layer();
     
     var imageObj = document.getElementById(cardsId);
