@@ -12,8 +12,8 @@ function getCardRect(cardsMap, totalCount, card)
 	var rowLength = totalCount / 4;
     var startIndex = cardFaces.length - rowLength;
 
-    var cardWidth = Math.floor(cardsMap.width / rowLength);
-    var cardHeight = Math.floor(cardsMap.height / 4);
+    var cardWidth = Math.floor(cardsMap.naturalWidth / rowLength);
+    var cardHeight = Math.floor(cardsMap.naturalHeight / 4);
     
     var cardY = suiteIndex + cardHeight;
     var cardX = 0;
@@ -60,10 +60,4 @@ function draw() {
         x = x + cardW / cardShift;
         ctx.drawImage(packs, r * cardWidth, 0, cardWidth, cardHeight, x, y, cardW, cardH);
     }
-}
-
-function shuffle()
-{
-  
-    var deck = [];
 }

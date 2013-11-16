@@ -3,72 +3,82 @@
 from __future__ import unicode_literals
 
 import os
-import uuid
-#from django.utils import simplejson
+# from django.utils import simplejson
 from google.appengine.api import modules
-from google.appengine.ext import ndb
 from google.appengine.api import channel
 from google.appengine.api import app_identity
+from google.appengine.api import users
 from google.appengine.ext.webapp import template
-
 import webapp2
+
+import games
+import logs
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
         module = modules.get_current_module_name()
         instance = modules.get_current_instance_id()
         # self.response.write('Module {0}, instance {1}'.format(module, instance))
-        template_values = {'current_module_name': module,
-                           'current_instance_id': instance
-                          }
+        current_games = games.Game.find_games()
+        template_values = {
+            'current_module_name': module,
+            'current_instance_id': instance,
+            'current_games': current_games
+            }
         path = os.path.join(os.path.dirname(__file__), 'index.html')
         self.response.out.write(template.render(path, template_values))       
 
-class GameModel(ndb.Model):
-    """All the data we store for a game"""
-    date = ndb.DateTimeProperty(auto_now_add=True)
+class AuthHandler(webapp2.RequestHandler):
+    def __init__(self, request, response):
+        self.initialize(request, response)
+        self.current_user = None
     
-class Game(object):
-    @classmethod
-    def get_game_url(cls, user_id, game_id):
-        return '/' + str(user_id) + '/game/' + str(game_id)
+    def check_user(self):
+        user = users.get_current_user()
+        if user:
+            self.current_user = user
+        else:
+            webapp2.redirect(users.create_login_url(self.request.url), abort = True)
 
-class NewGameHandler(webapp2.RequestHandler):
-    def get(self, user_id):
-        game = GameModel()
-        game_key = game.put()
-        uri = Game.get_game_url(user_id, game_key.id())
-        return webapp2.redirect(uri)
+class NewGameHandler(AuthHandler):
+    def get(self):
+        self.check_user()
+        # create new game and save
+        game = games.Game()
+        game_id = game.save()
+        # redirect client to this new game
+        return webapp2.redirect(games.Game.get_game_url(game_id))
         
-class GameHandler(webapp2.RequestHandler):
-    def get(self, user_id, game_id):
+class GameHandler(AuthHandler):
+    def get(self, game_id):
         if not game_id:
             return 'Missing game ID'
 
-        if not user_id:
-            self.response.write('Wrong user uuid')
-            return
-             
-        token = channel.create_channel(user_id + game_id)
+        self.check_user()
+
+        token = channel.create_channel(self.current_user.user_id() + game_id)
         game_link = app_identity.get_default_version_hostname() + \
-            Game.get_game_url(user_id, game_id)
+            games.Game.get_game_url(game_id)
             
         template_values = {'token': token,
                            'game_id': game_id,
                            'game_link': game_link,
+                           'me': self.current_user.user_id(),
                            'initial_message': ''
                           }
         path = os.path.join(os.path.dirname(__file__), 'game.html')
         self.response.out.write(template.render(path, template_values))       
 
-class OpenedPage(webapp2.RequestHandler):
+class OpenedPage(AuthHandler):
     def post(self):
-        pass
-    # channel.send_message(self.game.userO.user_id() + self.game.key().id_or_name(), message)
+        self.check_user()
+        # channel.send_message(self.game.userO.user_id() + self.game.key().id_or_name(), message)
 
 app = webapp2.WSGIApplication([
     (r'/', MainHandler),
-    webapp2.Route(r'/<user_id>/game/new', handler=NewGameHandler),
-    webapp2.Route(r'/<user_id>/game/<game_id>', handler=GameHandler),
+    (r'/logs', logs.LogsPage),
+    webapp2.Route(r'/game/new', handler=NewGameHandler),
+    webapp2.Route(r'/game/<game_id>', handler=GameHandler),
     (r'/opened', OpenedPage),
 ], debug=True)
+
