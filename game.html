@@ -4,16 +4,16 @@
 <meta charset='UTF-8' />
 <title>Game</title>
 <script src='/_ah/channel/jsapi'></script>
-<script src='/js/kinetic-v4.7.2.js'></script>
-<script src='/js/comms.js'></script>
-<script src='/js/cards.js'></script>
-<script src='/js/scene.js'></script>
+<script src='js/kinetic-v4.7.2.js'></script>
+<script src='js/comms.js'></script>
+<script src='js/cards.js'></script>
+<script src='js/scene.js'></script>
 <script type='text/javascript'>
     var state = {
         game_id: '{{ game_id }}',
         game_link: '{{ game_link }}',
         me: '{{ me }}',
-        initial_message: '{{initial_message}}'
+        game_state: '{{ game_state }}'
     };
       
     function start() {
@@ -24,10 +24,10 @@
 </head>
 <body onload='start();'>
     <div style='display: none;'>
-        <img id='cards' src='/images/cards/ornamental_36_180dpi.png'/>
-        <img id='decks' src='/images/cards/decks.png' />
+        <img id='cards' src='images/cards/ornamental_36_180dpi.png'/>
+        <img id='decks' src='images/cards/decks.png' />
     </div>
-    <canvas id='canvas' width='800' height='480'></canvas>
     <div id='kntc'></div>
+    <canvas id='canvas' width='800' height='480'></canvas>
 </body>
 </html>

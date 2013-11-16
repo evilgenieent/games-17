@@ -12,7 +12,15 @@ handlers:
 - url: /js
   static_dir: js 
 
+# This allows to use urls like this "js/script.js" in html 
+- url: /game/js
+  static_dir: js 
+
 - url: /images
+  static_dir: images
+   
+# This allows to use urls like this "js/script.js" in html 
+- url: /game/images
   static_dir: images 
 
 - url: /.*
