@@ -45,27 +45,27 @@ class NewGameHandler(AuthHandler):
         self.check_user()
         # create new game and save
         game = games.Game()
-        game_id = game.save()
+        game.save()
         # redirect client to this new game
-        return webapp2.redirect(games.Game.get_game_url(game_id))
+        return webapp2.redirect(game.get_url())
         
 class GameHandler(AuthHandler):
     def get(self, game_id):
-        if not game_id:
-            return 'Missing game ID'
-
         self.check_user()
 
-        token = channel.create_channel(self.current_user.user_id() + game_id)
-        game_link = app_identity.get_default_version_hostname() + \
-            games.Game.get_game_url(game_id)
+        game = games.Game.load(game_id)
+        player = game.add_player(self.current_user)
+
+        token = channel.create_channel(player.user_id + game_id)
+        game_link = app_identity.get_default_version_hostname() + game.get_url()
             
-        template_values = {'token': token,
-                           'game_id': game_id,
-                           'game_link': game_link,
-                           'me': self.current_user.user_id(),
-                           'initial_message': ''
-                          }
+        template_values = {
+            'token': token,
+            'game_id': game_id,
+            'game_link': game_link,
+            'me': player.user_id,
+            'game_state': game.get_user_view(player.user)
+        }
         path = os.path.join(os.path.dirname(__file__), 'game.html')
         self.response.out.write(template.render(path, template_values))       
 

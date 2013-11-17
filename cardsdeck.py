@@ -3,30 +3,39 @@ Created on 4 Nov 2013
 
 @author: burnevsk
 '''
-
 import random
 
-class CardsDeck(object):
-    '''
-    Represents a deck of playing cards, with utilities
-    '''
-    Suits = ['s','c','d','h']
-    Faces = ['a','k','q','j','10','9','8','7','6','5','4','3','2']
-    Jokers = ['r','b']
+Suits = ['s','c','d','h']
+Faces = ['a','k','q','j','10','9','8','7','6','5','4','3','2']
+Jokers = ['r','b']
 
+class Pack(object):
+    ''' Base class, which just stores a list of cards '''
+    _cards = []
+
+    def __repr__(self):
+        return ' '.join(self._cards)
+
+class Hand(Pack):
+    ''' Represents cards that a player has at hands '''
     def __init__(self, size):
-        self.deck = CardsDeck.create_deck(size)
-        random.shuffle(self.deck)
+        self._max_size = size
+        
+class Deck(Pack):
+    ''' Represents a deck of playing cards, with utilities '''
+    def __init__(self, size):
+        self._cards = Deck.create_deck(size)
+        random.shuffle(self._cards)
         
     def deal_one(self):
-        return self.deck.pop()
+        return self._cards.pop()
         
     def deal_many(self, count):
-        if count < len(self.deck):
+        if count < len(self._cards):
             raise IndexError
         cards = []
         for k in range(count):
-            cards.append(self.deck.pop())
+            cards.append(self._cards.pop())
         return cards
 
     @classmethod
@@ -41,11 +50,10 @@ class CardsDeck(object):
         useJokers = (size == 54)
         family = size // 4
         cards = []
-        for s in CardsDeck.Suits:
+        for s in Suits:
             for f in range(family):
-                cards.append(s + CardsDeck.Faces[f])
+                cards.append(s + Faces[f])
         if useJokers:
-            cards.append(CardsDeck.Jokers)
+            cards.append(Jokers)
         return cards
             
-        
