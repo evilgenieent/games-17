@@ -7,33 +7,51 @@ from google.appengine.ext import ndb
 import cardsdeck
 
 class PlayerModel(ndb.Model):
-    user_id = ndb.IntegerProperty(required = True)
-    cards = ndb.StringProperty(indexed = False)
+    user = ndb.IntegerProperty(required = True)
+    name = ndb.StringProperty()
+    hand = ndb.StringProperty(indexed = False)
     
 class Player(object):
-    number = None   # number of the player in a game
-    def __init__(self, user):
-        self._user = user
-        self.populate(user_id = user.id())
-        
-    def user_id(self):
-        return self._user.id()
+    number = None   # place of the player in a game, int
+    hand = None     # current cards at hand, str[]
     
-    def get_ouside_view(self):
+    _model = None   # PlayerModel 
+    
+    def __init__(self, user):
+        self.user_id = user.id()
+        self.nickname = user.nickname()
+        self._model = PlayerModel()
+        self._model.populate(user = user.id())
+        self.hand = []
+
+    @staticmethod
+    def load(game_id):
+        self = Game() 
+        self._model = GameModel.get_by_id(game_id)
+        if not self._model:
+            raise KeyError
+        return self
+            
+    def save(self):
+        self._model.deck = str(self._deck)
+        self._model.table = str(self._table)
+        return self._model.put().id()
+
+    def get_outside_view(self):
         return {
-            'nick': self._user.email(),
+            'nick': self.nickname,
             'num_cards': len(self.hand)
             }
 
     def get_inside_view(self):
-        view = self.get_inside_view()
-        view.cards = self._cards
+        view = self.get_outside_view()
+        view['cards'] = cardsdeck.to_string(self.hand)
         return view
         
 class GameModel(ndb.Model):
     """All the data we store for a game"""
-    date = ndb.DateTimeProperty(auto_now_add=True)
-    player = ndb.StructuredProperty(Player, repeated = True)
+    date = ndb.DateTimeProperty(auto_now_add  =True)
+    player = ndb.StructuredProperty(PlayerModel, repeated = True)
     deck = ndb.StringProperty(indexed = False)
     table = ndb.StringProperty(indexed = False)
     
@@ -91,7 +109,7 @@ class Thousand(Game):
             self._players.append(player)
 
             # TODO: cards should be dealt only when game starts
-            player.cards = self._deck.deal_many(Thousand.INITIAL_HAND_SIZE)
+            player.take_cards(self._deck.deal_many(Thousand.INITIAL_HAND_SIZE))
             
             return player
         else:

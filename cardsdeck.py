@@ -1,28 +1,35 @@
 '''
 Created on 4 Nov 2013
 
-@author: burnevsk
+@author: sergey.burnevsky@gmail.com
 '''
 import random
 
 Suits = ['s','c','d','h']
-Faces = ['a','k','q','j','10','9','8','7','6','5','4','3','2']
+Faces = ['a','k','q','j','t','9','8','7','6','5','4','3','2']
 Jokers = ['r','b']
 
-class Pack(object):
-    ''' Base class, which just stores a list of cards '''
-    _cards = []
+'''
+Cards a represented by a list of 2-char strings, made up
+by concatenating suit and face substrings, like "sq" - Queen of Spades.
+Jokers a single-char strings.
+'''
 
-    def __repr__(self):
-        return ' '.join(self._cards)
+def to_string(cards):
+    ''' Converts cards list to a single string, for serialization '''
+    return ' '.join(cards)
 
-class Hand(Pack):
-    ''' Represents cards that a player has at hands '''
-    def __init__(self, size):
-        self._max_size = size
-        
-class Deck(Pack):
-    ''' Represents a deck of playing cards, with utilities '''
+def from_string(cards_str):
+    ''' Parsers list of cards from a string created as by tostring()'''
+    if isinstance(cards_str, basestring):
+        cards = cards_str.split(' ')
+        # TODO: check that every substring is correctly encoded card
+        return cards
+    else:
+        raise TypeError('String is expected')
+
+class Deck(object):
+    ''' Represents a deck of cards, which should not be accessed directly '''
     def __init__(self, size):
         self._cards = Deck.create_deck(size)
         random.shuffle(self._cards)
@@ -31,7 +38,7 @@ class Deck(Pack):
         return self._cards.pop()
         
     def deal_many(self, count):
-        if count < len(self._cards):
+        if count > len(self._cards):
             raise IndexError
         cards = []
         for k in range(count):
@@ -54,6 +61,6 @@ class Deck(Pack):
             for f in range(family):
                 cards.append(s + Faces[f])
         if useJokers:
-            cards.append(Jokers)
+            cards.extend(Jokers)
         return cards
             
